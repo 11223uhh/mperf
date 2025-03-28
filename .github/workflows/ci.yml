@@ -1,0 +1,94 @@
+name: CI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  style-check:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        submodules: recursive
+        
+    - name: Install clang-format
+      run: sudo apt-get install -y clang-format
+      
+    - name: Check code style
+      run: |
+        find . -name '*.cpp' -o -name '*.h' -o -name '*.hpp' | while read file; do
+          clang-format -style=file -i "$file"
+        done
+        git diff --exit-code
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        submodules: recursive
+        
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y build-essential cmake ninja-build
+
+    - name: Configure CMake
+      run: |
+        mkdir build
+        cd build
+        cmake .. -GNinja
+
+    - name: Build
+      run: |
+        cd build
+        ninja
+
+  android-build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        submodules: recursive
+
+    - name: Set up JDK
+      uses: actions/setup-java@v3
+      with:
+        java-version: '11'
+        distribution: 'temurin'
+
+    - name: Setup Android SDK
+      uses: android-actions/setup-android@v2
+
+    - name: Build Android
+      run: |
+        chmod +x android_build.sh
+        ./android_build.sh
+
+  test:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        submodules: recursive
+        
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y build-essential cmake ninja-build
+
+    - name: Configure CMake
+      run: |
+        mkdir build
+        cd build
+        cmake .. -GNinja -DBUILD_TEST=ON
+
+    - name: Build and run tests
+      run: |
+        cd build
+        ninja
+        ctest --output-on-failure
