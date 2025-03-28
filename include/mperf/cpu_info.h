@@ -33,6 +33,10 @@ int cpu_info_get_middle_cpu_count();
 int cpu_info_get_big_cpu_count();
 int cpu_info_set_cpu_powersave(int powersave);
 
+// CPU timing and frequency
+uint64_t cpu_info_ref_freq(int dev_id = 0);
+uint64_t cpu_info_ref_cycles(int dev_id = 0);
+
 // Denormal handling
 int cpu_info_get_flush_denormals();
 int cpu_info_set_flush_denormals(int flush_denormals);
