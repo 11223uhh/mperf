@@ -1,84 +1,50 @@
 #pragma once
 
-#include <map>
-#include <string>
 #include <cstdint>
-#include <vector>
+#include <string>
 
 namespace mperf {
 
-//! get cpu vendor
-std::string cpu_info_vendor();
+// CPU feature detection
+int cpu_info_support_arm_neon();
+int cpu_info_support_arm_vfpv4();
+int cpu_info_support_arm_asimdhp();
+int cpu_info_support_arm_asimddp();
+int cpu_info_support_x86_avx();
+int cpu_info_support_x86_fma();
+int cpu_info_support_x86_xop();
+int cpu_info_support_x86_avx2();
+int cpu_info_support_x86_avx_vnni();
+int cpu_info_support_x86_avx512();
+int cpu_info_support_x86_avx512_vnni();
+int cpu_info_support_mips_msa();
+int cpu_info_support_loongson_mmi();
+int cpu_info_support_riscv_v();
+int cpu_info_support_riscv_zfh();
+int cpu_info_cpu_riscv_vlenb();
 
-//! get cpu brand
-std::string cpu_info_brand();
+// CPU information
+int cpu_info_get_cpu_count();
+int cpu_info_get_active_cpu_count(int powersave);
+int cpu_info_get_max_freq_khz(int cpuid);
+int cpu_info_get_cpu_powersave();
+int cpu_info_get_little_cpu_count();
+int cpu_info_get_middle_cpu_count();
+int cpu_info_get_big_cpu_count();
+int cpu_info_set_cpu_powersave(int powersave);
 
-//! get cpu family
-int cpu_info_family();
+// Denormal handling
+int cpu_info_get_flush_denormals();
+int cpu_info_set_flush_denormals(int flush_denormals);
 
-//! get cpu model
-int cpu_info_model();
+// Feature support string
+std::string cpu_info_support_features();
 
-//! get cpu stepping
-int cpu_info_stepping();
-
-//! get cpu type
-int cpu_info_type();
-
-//! get cpu cores number
-int cpu_info_cores();
-
-//! get cpu logical processors number
-int cpu_info_processors();
-
-//! get cpu frequency
-float cpu_info_max_frequency();
-
-//! get cpu frequency
-float cpu_info_min_frequency();
-
-//! get cpu frequency
-float cpu_info_cur_frequency();
-
-//! get cpu cache size
-int cpu_info_l1_cache_size();
-int cpu_info_l2_cache_size();
-int cpu_info_l3_cache_size();
-
-//! get cpu cache line size
-int cpu_info_cache_line_size();
-
-//! get cpu tlb size
-int cpu_info_tlb_size();
-
-//! get cpu features
-std::vector<std::string> cpu_info_features();
-
-//! get cpu features map
-std::map<std::string, bool> cpu_info_features_map();
-
-//! check if cpu support feature
-bool cpu_info_support_feature(const std::string& feature);
-
-//! get cpu microarchitecture
-std::string cpu_info_uarch();
-
-//! get cpu isa
-std::string cpu_info_isa();
-
-//! get cpu endian
-std::string cpu_info_endian();
-
-//! get cpu bits
-int cpu_info_bits();
-
-//! get cpu registers
-int cpu_info_registers();
-
-//! get cpu reference frequency
-uint64_t cpu_info_ref_freq(int dev_id = 0);
-
-//! get cpu reference cycles
-uint64_t cpu_info_ref_cycles(int dev_id = 0);
+// CPU architecture specific types
+#if defined(__x86_64__) || defined(_M_X64)
+using cpu_set_t = unsigned long long;
+#else
+using cpu_set_t = unsigned long;
+#endif
 
 } // namespace mperf
